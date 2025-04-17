@@ -12,38 +12,30 @@ for i in reader:
     yset.append(float(i[1]))
 fh.close()
 
+xset = np.array(xset)
+yset = np.array(yset)
 n = len(xset)
 p = 0.000000001
 tries = 10000
 
 def meanError(m, c):
-    error = 0
-    for i in range(0, n):
-        error += (m*xset[i] + c - yset[i]) ** 2
-    merror = error/n
-    return merror
+    pred = m*xset + c
+    error = (pred - yset) ** 2
+    return np.mean(error)
 
 def pderm(m, c):
-    temp = 0
-    for i in range(n):
-        temp += (m*xset[i] + c - yset[i]) * xset[i]
-    return (2/n) * temp
+    return  2 * np.mean((m * xset + c - yset) * xset)
 
 def pderc(m, c):
-    temp = 0
-    for i in range(n):
-        temp += (m*xset[i] + c - yset[i])
-    return (2/n) * temp
+    return  2 * np.mean(m * xset + c - yset)
 
 m = c = 1
 
 for i in range(tries):
-    print("Mean Error:", meanError(m, c))
     m -= p * pderm(m, c)
     c -= p * pderc(m, c)
-    print(m, c)
 
-x = np.linspace(min(xset), max(xset) + 10, 101)
+x = np.linspace(min(xset), max(xset), 101)
 y = m*x + c
 plt.plot(xset, yset, 'o')
 plt.plot(x, y)
